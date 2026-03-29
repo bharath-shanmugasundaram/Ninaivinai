@@ -476,8 +476,8 @@ Same as `/search` but with Qdrant payload filtering.
 
 ## Credits
 
-- **Frontend Development** — *[Frontend Developer Name]*
-- **Backend & ML Pipeline** — Bharath Shanmugasundaram
+- **Frontend Development** — [Swathi VS](https://github.com/swathi-vs)
+- **Backend & ML Pipeline** — [Bharath Shanmugasundaram](https://github.com/bharath-shanmugasundaram)
 
 ---
 
