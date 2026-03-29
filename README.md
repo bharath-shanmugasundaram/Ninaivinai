@@ -1,4 +1,4 @@
-# 🧠 Ninaivinai
+# Ninaivinai
 
 > *"Ninaivinai"* (நினைவினை) — Tamil for **"memory"**
 
@@ -8,114 +8,114 @@ Ninaivinai is a full-stack **Retrieval-Augmented Generation (RAG)** application 
 
 ---
 
-## ✨ Features
+## Features
 
-- 🎙️ **GPU-Accelerated Transcription** — Real-time speech-to-text powered by [Faster Whisper](https://github.com/SYSTRAN/faster-whisper) (CTranslate2 engine) running on CUDA with `float16` precision
-- 🧩 **Overlapping Semantic Chunking** — Raw transcription segments are intelligently merged into ~512-character context windows. Each window overlaps by exactly 1 segment with the previous, ensuring no conversational context is lost at chunk boundaries
-- 🔢 **Dual-Layer Embeddings** — Every 512-char parent chunk gets a 1024-dimensional vector embedding via [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3). Additionally, each individual sentence within a chunk also receives its own independent embedding, enabling sub-chunk precision during retrieval
-- 🔍 **Two-Stage Search** — Stage 1: Qdrant vector DB retrieves the top-k most similar parent chunks. Stage 2: A manual dot-product similarity loop runs over all sub-sentences within each chunk to surface the single most relevant sentence with its exact timestamp
-- 🎬 **Instant Video Seek** — Search results carry precise `start` and `end` timestamps. The frontend's `VideoPlayer` component auto-seeks to the exact second
-- 🌗 **Dark/Light Theme** — Premium glassmorphism UI with smooth theme transitions
-- 🔒 **Client-Side Audio Extraction** — Video-to-MP3 conversion happens entirely in-browser using Web Audio API + lamejs encoder, saving upload bandwidth
-- 🔗 **CORS Enabled** — Full cross-origin support via FastAPI middleware for seamless frontend-backend communication through ngrok tunnels
-
----
-
-## 🏗️ System Architecture
-
-```
-┌───────────────────────────────────────────────────────────────┐
-│                     FRONTEND (React + Vite)                   │
-│                                                               │
-│  LandingPage ──► Dashboard ──► Workspace                      │
-│                   (Drag & Drop)   ┌──────────┬──────────────┐ │
-│                                   │  Video   │    Chat      │ │
-│                                   │  Player  │◄─ Interface  │ │
-│                                   └──────────┘  (query box) │ │
-│                                                  │           │ │
-│  audioConverter.js ──► MP3 in-browser             │           │ │
-│  api.js ──► All HTTP calls to backend             │           │ │
-└───────────────────────────────────────────────────┼───────────┘
-                                                    │ HTTPS
-                                              ┌─────┴─────┐
-                                              │   ngrok   │
-                                              └─────┬─────┘
-                                                    │ HTTP
-┌───────────────────────────────────────────────────┼───────────┐
-│                   BACKEND (FastAPI + Uvicorn)      │           │
-│                                                    │           │
-│  POST /transcribe ────► faster_whisper (CUDA)      │           │
-│  POST /embedding  ────► BAAI/bge-m3 (CUDA)         │           │
-│  POST /add_overlap ───► Chunk + Embed all layers   │           │
-│  POST /add ───────────► Upsert to Qdrant           │           │
-│  POST /search ────────► Qdrant search              │           │
-│                         └► dot-product refinement   │           │
-│                            └► exact sentence match  │           │
-│                                                               │
-│  CORS Middleware enabled (allow_origins=["*"])                 │
-└───────────────────────────────────────────────────────────────┘
-                               │
-                    ┌──────────┴──────────┐
-                    │   Qdrant Vector DB  │
-                    │   localhost:6333    │
-                    │   1024-dim cosine   │
-                    └─────────────────────┘
-```
+- **GPU-Accelerated Transcription** — Real-time speech-to-text powered by [Faster Whisper](https://github.com/SYSTRAN/faster-whisper) (CTranslate2 engine) running on CUDA with `float16` precision
+- **Overlapping Semantic Chunking** — Raw transcription segments are intelligently merged into ~512-character context windows. Each window overlaps by exactly 1 segment with the previous, ensuring no conversational context is lost at chunk boundaries
+- **Dual-Layer Embeddings** — Every 512-char parent chunk gets a 1024-dimensional vector embedding via [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3). Additionally, each individual sentence within a chunk also receives its own independent embedding, enabling sub-chunk precision during retrieval
+- **Two-Stage Search** — Stage 1: Qdrant vector DB retrieves the top-k most similar parent chunks. Stage 2: A manual dot-product similarity loop runs over all sub-sentences within each chunk to surface the single most relevant sentence with its exact timestamp
+- **Instant Video Seek** — Search results carry precise `start` and `end` timestamps. The frontend's `VideoPlayer` component auto-seeks to the exact second
+- **Dark/Light Theme** — Premium glassmorphism UI with smooth theme transitions
+- **Client-Side Audio Extraction** — Video-to-MP3 conversion happens entirely in-browser using Web Audio API + lamejs encoder, saving upload bandwidth
+- **CORS Enabled** — Full cross-origin support via FastAPI middleware for seamless frontend-backend communication through ngrok tunnels
 
 ---
 
-## 📁 Project Structure
+## System Architecture
+
+```
++---------------------------------------------------------------+
+|                     FRONTEND (React + Vite)                   |
+|                                                               |
+|  LandingPage --> Dashboard --> Workspace                      |
+|                   (Drag & Drop)   +----------+--------------+ |
+|                                   |  Video   |    Chat      | |
+|                                   |  Player  |<- Interface  | |
+|                                   +----------+  (query box) | |
+|                                                  |           | |
+|  audioConverter.js --> MP3 in-browser             |           | |
+|  api.js --> All HTTP calls to backend             |           | |
++---------------------------------------------------+-----------+
+                                                    | HTTPS
+                                              +-----+-----+
+                                              |   ngrok   |
+                                              +-----+-----+
+                                                    | HTTP
++---------------------------------------------------+-----------+
+|                   BACKEND (FastAPI + Uvicorn)      |           |
+|                                                    |           |
+|  POST /transcribe -----> faster_whisper (CUDA)     |           |
+|  POST /embedding  -----> BAAI/bge-m3 (CUDA)        |           |
+|  POST /add_overlap ----> Chunk + Embed all layers  |           |
+|  POST /add ------------> Upsert to Qdrant          |           |
+|  POST /search ---------> Qdrant search             |           |
+|                          +-> dot-product refinement |           |
+|                             +-> exact sentence match|           |
+|                                                               |
+|  CORS Middleware enabled (allow_origins=["*"])                 |
++---------------------------------------------------------------+
+                               |
+                    +----------+----------+
+                    |   Qdrant Vector DB  |
+                    |   localhost:6333    |
+                    |   1024-dim cosine   |
+                    +---------------------+
+```
+
+---
+
+## Project Structure
 
 ```
 Ninaivinai/
-│
-├── Frontend/Ninaivinai/              # React 19 + Vite 8 SPA
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── VideoPlayer.jsx       # HTML5 video with imperative seekTo() API
-│   │   │   ├── ChatInterface.jsx     # Chat UI: embed query → search DB → display results
-│   │   │   └── NavigationBar.jsx     # Top nav with theme toggle
-│   │   ├── pages/
-│   │   │   ├── LandingPage.jsx       # Hero page with product overview
-│   │   │   ├── Dashboard.jsx         # Drag-and-drop video upload zone
-│   │   │   ├── Workspace.jsx         # Main workspace: runs full ingestion pipeline
-│   │   │   └── LoginPage.jsx         # Auth UI (sign in / sign up)
-│   │   ├── services/
-│   │   │   ├── api.js                # All backend API calls (transcribe, embed, search, etc.)
-│   │   │   └── mockApi.js            # Mock data for offline development
-│   │   ├── contexts/
-│   │   │   ├── ThemeContext.jsx       # Dark/Light mode state management
-│   │   │   └── AuthContext.jsx        # Authentication state management
-│   │   ├── utils/
-│   │   │   └── audioConverter.js      # In-browser video → MP3 conversion (Web Audio API + lamejs)
-│   │   ├── App.jsx                    # Root component with React Router
-│   │   ├── main.jsx                   # Entry point
-│   │   └── index.css                  # Global design tokens and styles
-│   └── package.json
-│
-├── Utilis/                            # Backend server & ML models
-│   ├── server.py                      # FastAPI app with all API endpoints
-│   ├── embedding.py                   # SentenceTransformer model loader (BAAI/bge-m3, CUDA)
-│   ├── transcriber.py                 # Faster Whisper model loader (base.en, CUDA, float16)
-│   ├── runner.py                      # Keep-alive pinger to prevent ngrok tunnel timeout
-│   └── mp4_to_mp3.py                  # Utility: convert video to audio locally
-│
-├── vid2text/                          # Standalone CLI pipeline
-│   └── main.py                        # Extract audio → transcribe → save JSON/TXT
-│
-├── test_api.py                        # Full integration test suite for all endpoints
-├── test_gpu.py                        # CUDA/GPU verification script
-├── audio/                             # Sample transcription outputs
-│   ├── vi.mp4                         # Sample video file
-│   ├── vi_transcription.json          # Sample JSON transcription output
-│   └── vi_transcription.txt           # Sample human-readable transcription
-│
-└── README.md
+|
++-- Frontend/Ninaivinai/              # React 19 + Vite 8 SPA
+|   +-- src/
+|   |   +-- components/
+|   |   |   +-- VideoPlayer.jsx       # HTML5 video with imperative seekTo() API
+|   |   |   +-- ChatInterface.jsx     # Chat UI: embed query -> search DB -> display results
+|   |   |   +-- NavigationBar.jsx     # Top nav with theme toggle
+|   |   +-- pages/
+|   |   |   +-- LandingPage.jsx       # Hero page with product overview
+|   |   |   +-- Dashboard.jsx         # Drag-and-drop video upload zone
+|   |   |   +-- Workspace.jsx         # Main workspace: runs full ingestion pipeline
+|   |   |   +-- LoginPage.jsx         # Auth UI (sign in / sign up)
+|   |   +-- services/
+|   |   |   +-- api.js                # All backend API calls (transcribe, embed, search, etc.)
+|   |   |   +-- mockApi.js            # Mock data for offline development
+|   |   +-- contexts/
+|   |   |   +-- ThemeContext.jsx       # Dark/Light mode state management
+|   |   |   +-- AuthContext.jsx        # Authentication state management
+|   |   +-- utils/
+|   |   |   +-- audioConverter.js      # In-browser video -> MP3 conversion (Web Audio API + lamejs)
+|   |   +-- App.jsx                    # Root component with React Router
+|   |   +-- main.jsx                   # Entry point
+|   |   +-- index.css                  # Global design tokens and styles
+|   +-- package.json
+|
++-- Utilis/                            # Backend server & ML models
+|   +-- server.py                      # FastAPI app with all API endpoints
+|   +-- embedding.py                   # SentenceTransformer model loader (BAAI/bge-m3, CUDA)
+|   +-- transcriber.py                 # Faster Whisper model loader (base.en, CUDA, float16)
+|   +-- runner.py                      # Keep-alive pinger to prevent ngrok tunnel timeout
+|   +-- mp4_to_mp3.py                  # Utility: convert video to audio locally
+|
++-- vid2text/                          # Standalone CLI pipeline
+|   +-- main.py                        # Extract audio -> transcribe -> save JSON/TXT
+|
++-- test_api.py                        # Full integration test suite for all endpoints
++-- test_gpu.py                        # CUDA/GPU verification script
++-- audio/                             # Sample transcription outputs
+|   +-- vi.mp4                         # Sample video file
+|   +-- vi_transcription.json          # Sample JSON transcription output
+|   +-- vi_transcription.txt           # Sample human-readable transcription
+|
++-- README.md
 ```
 
 ---
 
-## 🔄 Detailed Workflow
+## Detailed Workflow
 
 ### Phase 1: Ingestion Pipeline (What happens when you upload a video)
 
@@ -156,36 +156,38 @@ During this step, `embedding.py` computes two layers of embeddings:
       "start": 0.48,
       "end": 38.80,
       "text": "Long, long ago...The company gives you a lot of stuff.",
-      "embedding": [0.0234, -0.0891, ...],            // ← 1024-dim parent vector
+      "embedding": [0.0234, -0.0891, "...1024 floats..."],
       "sentences": [
         {
           "start": 0.48, "end": 6.24,
           "text": "Long, long ago...",
-          "embedding": [0.0412, -0.0123, ...]          // ← 1024-dim sentence vector
+          "embedding": [0.0412, -0.0123, "...1024 floats..."]
         },
         {
           "start": 6.24, "end": 13.44,
           "text": "I used to ask my teammates...",
-          "embedding": [0.0567, -0.0234, ...]
+          "embedding": [0.0567, -0.0234, "...1024 floats..."]
         }
       ]
     },
     {
-      "start": 33.12,                                   // ← overlap! starts from last segment of prev chunk
+      "start": 33.12,
       "end": 58.16,
       "text": "Until then?...So tell me.",
-      "embedding": [0.0189, -0.0456, ...],
+      "embedding": [0.0189, -0.0456, "...1024 floats..."],
       "sentences": [
         {
           "start": 33.12, "end": 38.80,
-          "text": "Until then?...",                      // ← this sentence exists in BOTH chunks
-          "embedding": [0.0345, -0.0567, ...]
+          "text": "Until then?...",
+          "embedding": [0.0345, -0.0567, "...1024 floats..."]
         }
       ]
     }
   ]
 }
 ```
+
+> **Note:** The sentence starting at `33.12s` exists in **both** chunks — this is the overlap ensuring no context is lost.
 
 #### Step 4 — Vector Indexing (`POST /create_collection` + `POST /add`)
 A unique Qdrant collection is created per video (named from the filename + timestamp). Each 512-char segment is stored as a point in the vector space, with the parent embedding as the vector and the full payload (text, timestamps, and the entire `sentences` array with their individual embeddings) stored as metadata.
@@ -197,7 +199,7 @@ A unique Qdrant collection is created per video (named from the filename + times
 #### Step 1 — Query Embedding (`POST /embedding`)
 The `ChatInterface` component takes the user's natural language query and sends it to `/embedding`, which returns a 1024-dim vector representation of the query text.
 
-#### Step 2 — Coarse Search (`POST /search` → Qdrant)
+#### Step 2 — Coarse Search (`POST /search` -> Qdrant)
 The query vector is sent to Qdrant via the REST API (`localhost:6333`). Qdrant performs a cosine similarity search across all parent chunk vectors and returns the top-k matches (default k=3).
 
 #### Step 3 — Fine-Grained Refinement (Dot-Product over Sub-Sentences)
@@ -229,7 +231,7 @@ The `ChatInterface` receives the response and calls `onTimestampFound(topMatch.s
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -274,9 +276,9 @@ ngrok http 8000
 ```
 
 Copy the generated HTTPS URL (e.g., `https://xxxx.ngrok-free.dev`) and update it in:
-- `Frontend/Ninaivinai/src/services/api.js` → `BASE_URL`
-- `vid2text/main.py` → `API_ENDPOINT_TRANS` and `API_ENDPOINT_EMB`
-- `Utilis/runner.py` → ping URL
+- `Frontend/Ninaivinai/src/services/api.js` -> `BASE_URL`
+- `vid2text/main.py` -> `API_ENDPOINT_TRANS` and `API_ENDPOINT_EMB`
+- `Utilis/runner.py` -> ping URL
 
 ### 5. Start the Frontend
 
@@ -296,7 +298,7 @@ python Utilis/runner.py
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### API Integration Tests
 
@@ -325,7 +327,7 @@ Runs 3 checks:
 
 ---
 
-## 🛠️ API Reference
+## API Reference
 
 ### `GET /`
 Health check endpoint.
@@ -337,7 +339,7 @@ Health check endpoint.
 ### `POST /transcribe`
 Upload an audio file for transcription.
 
-**Content-Type:** `multipart/form-data`
+**Content-Type:** `multipart/form-data`  
 **Body:** `file` — audio file (.mp3, .wav, .m4a, .mp4, .flac)
 
 **Response:**
@@ -357,14 +359,14 @@ Upload an audio file for transcription.
 ### `POST /embedding`
 Generate a 1024-dimensional embedding for input text.
 
-**Content-Type:** `application/json`
+**Content-Type:** `application/json`  
 **Body:** `{"text": "your query here"}`
 
 **Response:**
 ```json
 {
   "text": "your query here",
-  "embedding": [0.0234, -0.0891, ...]
+  "embedding": [0.0234, -0.0891, "...1024 floats..."]
 }
 ```
 
@@ -373,17 +375,17 @@ Generate a 1024-dimensional embedding for input text.
 ### `POST /add_overlap`
 Process raw transcription into overlapping semantic chunks with dual-layer embeddings.
 
-**Content-Type:** `application/json`
+**Content-Type:** `application/json`  
 **Body:** Full transcription JSON from `/transcribe`
 
-**Response:** Chunked transcription with parent + sentence embeddings (see [Workflow](#step-3--semantic-chunking-post-add_overlap))
+**Response:** Chunked transcription with parent + sentence embeddings (see Workflow section above)
 
 ---
 
 ### `POST /create_collection`
 Create a new Qdrant vector collection (1024-dim, cosine distance).
 
-**Content-Type:** `application/json`
+**Content-Type:** `application/json`  
 **Body:** `"collection_name"` (string)
 
 **Response:** `{"status": "collection created"}` or `{"status": "collection already exists"}`
@@ -393,18 +395,18 @@ Create a new Qdrant vector collection (1024-dim, cosine distance).
 ### `POST /add`
 Insert embedded chunks into a Qdrant collection. Stores the full sentences array in the payload for sub-chunk retrieval.
 
-**Content-Type:** `application/json`
+**Content-Type:** `application/json`  
 **Body:**
 ```json
 {
   "collectionname": "my_video_collection",
   "chunks": [
     {
-      "embedding": [0.02, -0.08, ...],
+      "embedding": [0.02, -0.08, "...1024 floats..."],
       "text": "...",
       "start": 0.0,
       "end": 10.0,
-      "sentences": [...]
+      "sentences": ["..."]
     }
   ]
 }
@@ -417,12 +419,12 @@ Insert embedded chunks into a Qdrant collection. Stores the full sentences array
 ### `POST /search`
 Semantic search with automatic sentence-level refinement.
 
-**Content-Type:** `application/json`
+**Content-Type:** `application/json`  
 **Body:**
 ```json
 {
   "collectionname": "my_video_collection",
-  "embedding": [0.02, -0.08, ...],
+  "embedding": [0.02, -0.08, "...1024 floats..."],
   "k": 3
 }
 ```
@@ -458,20 +460,27 @@ Same as `/search` but with Qdrant payload filtering.
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Details |
 |-------|------------|---------|
-| **Frontend** | React 19 + Vite 8 | SPA with React Router v7, Lucide icons |
-| **Backend** | FastAPI + Uvicorn | Async Python web server with CORS middleware |
-| **Transcription** | Faster Whisper | CTranslate2 engine, `base.en` model, CUDA float16 |
-| **Embeddings** | BAAI/bge-m3 | 1024-dim multilingual embeddings via SentenceTransformers |
-| **Vector DB** | Qdrant | Cosine similarity, REST API on port 6333 |
-| **Tunnel** | ngrok | HTTPS tunnel for remote GPU access |
-| **Audio Encoding** | lamejs | Client-side MP3 encoding via Web Audio API |
+| Frontend | React 19 + Vite 8 | SPA with React Router v7, Lucide icons |
+| Backend | FastAPI + Uvicorn | Async Python web server with CORS middleware |
+| Transcription | Faster Whisper | CTranslate2 engine, `base.en` model, CUDA float16 |
+| Embeddings | BAAI/bge-m3 | 1024-dim multilingual embeddings via SentenceTransformers |
+| Vector DB | Qdrant | Cosine similarity, REST API on port 6333 |
+| Tunnel | ngrok | HTTPS tunnel for remote GPU access |
+| Audio Encoding | lamejs | Client-side MP3 encoding via Web Audio API |
 
 ---
 
-## 📄 License
+## Credits
+
+- **Frontend Development** — *[Frontend Developer Name]*
+- **Backend & ML Pipeline** — Bharath Shanmugasundaram
+
+---
+
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
