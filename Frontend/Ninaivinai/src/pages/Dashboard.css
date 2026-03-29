@@ -1,0 +1,137 @@
+.dashboard-container {
+  padding: 100px 40px 60px;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.dashboard-header h2 {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.upload-card {
+  padding: 2px; /* For the gradient border effect if wanted, or just standard padding */
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.drag-area {
+  padding: 60px 40px;
+  border: 2px dashed rgba(235, 94, 40, 0.2);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--feature-bg);
+}
+
+.drag-area:hover, .drag-content.active {
+  border-color: rgba(235, 94, 40, 0.5);
+  background: rgba(235, 94, 40, 0.05);
+}
+
+.drag-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.upload-icon {
+  color: var(--accent-color);
+  margin-bottom: 12px;
+}
+
+.drag-content h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drag-content p {
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.upload-format {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--feature-bg);
+  padding: 4px 12px;
+  border-radius: 100px;
+}
+
+.file-preview {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--feature-bg);
+  padding: 24px 32px;
+  border-radius: 16px;
+  border: 1px solid var(--panel-border);
+  width: 100%;
+  max-width: 500px;
+}
+
+.file-icon {
+  color: var(--accent-color);
+}
+
+.file-details h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+.file-details p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.preview-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.analyze-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  padding: 12px 28px;
+}
+
+.recent-videos h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  border-radius: 16px;
+  background: transparent;
+  border: 1px dashed var(--panel-border);
+  color: var(--text-muted);
+}

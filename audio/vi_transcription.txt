@@ -1,0 +1,9 @@
+[0.48s → 6.24s]  Long, long ago, when the company used to give all the software we needed and all the computers we
+[6.24s → 13.44s]  needed, I used to ask my teammates, oh, okay, all that is fine. But what software have you purchased
+[13.44s → 18.96s]  for personal productivity? When everybody got a phone from the company, I asked them,
+[18.96s → 26.32s]  did you buy the cover? The scratch proof blast? Did you invest? When the company started giving
+[26.32s → 33.12s]  that too? I asked them, what apps have you installed? Paid subscriptions? Elevate perhaps?
+[33.12s → 38.80s]  Until then? I'm going back to the same question. The company gives you a lot of stuff.
+[39.92s → 45.76s]  What have you done on top of all that to improve your own personal productivity?
+[46.32s → 52.32s]  What tools have you subscribed for in this age of AI? Or are you just free loading on whatever the
+[52.32s → 58.16s]  company gives you? Because that is the mark of your intent. So tell me.

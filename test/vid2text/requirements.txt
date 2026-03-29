@@ -1,0 +1,6 @@
+fastapi==0.127.0
+faster-whisper==1.2.1
+moviepy==2.2.1
+python-multipart==0.0.21
+requests
+uvicorn==0.40.0
