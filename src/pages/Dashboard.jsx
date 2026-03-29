@@ -48,9 +48,8 @@ const Dashboard = () => {
 
   const handleAnalyze = () => {
     if (videoUrl) {
-      // In a real app, this might upload the video to a server first.
-      // We pass the local object URL via state for the Workspace to consume.
-      navigate('/workspace', { state: { videoSrc: videoUrl, fileName: file.name } });
+      // We pass the local object URL and the actual file object for the Workspace to consume.
+      navigate('/workspace', { state: { videoSrc: videoUrl, fileName: file.name, file: file } });
     }
   };
 

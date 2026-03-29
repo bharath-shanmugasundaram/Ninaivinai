@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, PlayCircle } from 'lucide-react';
-import { searchSemanticIndex } from '../services/mockApi';
+import { getEmbedding, searchDb } from '../services/api';
 import './ChatInterface.css';
 
-const ChatInterface = ({ onTimestampFound }) => {
+const ChatInterface = ({ onTimestampFound, collectionName, isReady }) => {
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
@@ -26,7 +26,7 @@ const ChatInterface = ({ onTimestampFound }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isSearching) return;
+    if (!input.trim() || isSearching || !isReady || !collectionName) return;
 
     const userQuery = input.trim();
     setInput('');
@@ -38,24 +38,38 @@ const ChatInterface = ({ onTimestampFound }) => {
     setIsSearching(true);
 
     try {
-      // Call Mock Vector DB
-      // TODO: Replace with real Endpoint (Content -> Embedding -> DB -> Timestamp)
-      const result = await searchSemanticIndex(userQuery);
+      // 1. Embed query
+      const embedRes = await getEmbedding(userQuery);
       
-      const systemMsg = {
-        id: (Date.now() + 1).toString(),
-        role: 'system',
-        content: result.text,
-        timestamp: result.timestamp
-      };
+      // 2. Search Vector DB
+      const searchRes = await searchDb(collectionName, embedRes.embedding, 3);
       
-      setMessages(prev => [...prev, systemMsg]);
-      
-      // Notify parent to jump timeline
-      if (result.timestamp !== null && onTimestampFound) {
-        onTimestampFound(result.timestamp);
+      if (searchRes && searchRes.length > 0) {
+        const topMatch = searchRes[0].payload;
+        
+        const systemMsg = {
+          id: (Date.now() + 1).toString(),
+          role: 'system',
+          content: `Exact match: "${topMatch.text}"`,
+          timestamp: topMatch.start
+        };
+        
+        setMessages(prev => [...prev, systemMsg]);
+        
+        // Notify parent to jump timeline
+        if (topMatch.start !== null && topMatch.start !== undefined && onTimestampFound) {
+          onTimestampFound(topMatch.start);
+        }
+      } else {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          role: 'system',
+          content: "I couldn't find any relevant moments for that query.",
+          timestamp: null
+        }]);
       }
     } catch (error) {
+       console.error("Search error:", error);
        setMessages(prev => [...prev, {
          id: 'error',
          role: 'system',
@@ -99,7 +113,7 @@ const ChatInterface = ({ onTimestampFound }) => {
         {isSearching && (
           <div className="message-bubble system searching">
             <Loader2 className="spinner" size={18} />
-            Searching semantic index...
+            Scanning semantic index...
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -110,14 +124,14 @@ const ChatInterface = ({ onTimestampFound }) => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="e.g. startup funding discussion..."
+          placeholder={isReady ? "e.g. startup funding discussion..." : "Waiting for indexing to complete..."}
           className="chat-input"
-          disabled={isSearching}
+          disabled={isSearching || !isReady}
         />
         <button 
           type="submit" 
-          className={`send-button ${input.trim() ? 'active' : ''}`}
-          disabled={!input.trim() || isSearching}
+          className={`send-button ${input.trim() && isReady ? 'active' : ''}`}
+          disabled={!input.trim() || isSearching || !isReady}
         >
           <Send size={18} />
         </button>

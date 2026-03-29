@@ -1,11 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Search, UploadCloud, CheckCircle2, Video } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 import './LandingPage.css';
 
 const LandingPage = () => {
-  const { user } = useAuth();
   return (
     <div className="landing-wrapper">
       <div className="landing-content">
@@ -22,11 +20,11 @@ const LandingPage = () => {
           <ul className="benefits-list">
             <li><CheckCircle2 size={18} className="list-icon" /> No manual transcription required</li>
             <li><CheckCircle2 size={18} className="list-icon" /> Understands concepts, not just keywords</li>
-            <li><CheckCircle2 size={18} className="list-icon" /> 100% private and secure workspace</li>
+            <li><CheckCircle2 size={18} className="list-icon" /> 100% private and local processing</li>
           </ul>
 
           <div className="hero-actions">
-            <Link to={user ? "/dashboard" : "/login"} className="action-btn primary-action">
+            <Link to="/dashboard" className="action-btn primary-action">
               Start Exploring
             </Link>
           </div>
